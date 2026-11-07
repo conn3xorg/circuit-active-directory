@@ -35,6 +35,8 @@ jobs:
         run: |
           go -C conn3x build -o "$RUNNER_TEMP/bin/conn3x" ./cmd/conn3x
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+          # Its test data has HCL that's broken on purpose, and fmt below would read it.
+          rm -rf conn3x
       - run: conn3x version
       - run: conn3x fmt -check -recursive
       - name: Validate
