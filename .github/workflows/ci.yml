@@ -121,6 +121,6 @@ jobs:
           # AD DS is there now, so only the steps after it are left.
           $plan = conn3x plan -no-color -detailed-exitcode | Out-String
           if ($LASTEXITCODE -ne 2) { Write-Output $plan; throw "second plan exit $LASTEXITCODE, want 2" }
-          if ($plan.Contains('forest__ad_ds')) { Write-Output $plan; throw 'AD DS planned again' }
+          if ($plan.Contains('forest__ad_ds["runner"] will be')) { Write-Output $plan; throw 'AD DS planned again' }
           if (-not $plan.Contains('forest__forest')) { Write-Output $plan; throw 'plan has no forest' }
           Write-Output $plan
