@@ -108,7 +108,7 @@ circuit "forest" {
   # Itself first, then loopback, as for any DC.
   step "dns" {
     windows_dns_client {
-      servers = [local.ip[local.root], "127.0.0.1"]
+      servers = distinct([local.ip[local.root], "127.0.0.1"])
     }
   }
 
@@ -194,7 +194,7 @@ circuit "domain_controllers" {
     depends_on = [conn3x_windows_ad_ou.forest__child_ous]
 
     windows_dns_client {
-      servers = [local.ip[local.root], "127.0.0.1"]
+      servers = distinct([local.ip[local.root], "127.0.0.1"])
     }
   }
 
