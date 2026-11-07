@@ -10,9 +10,9 @@ permissions:
   contents: read
 
 env:
-  # The first Conn3x commit with windows_ad_ou, windows_ad_group and
-  # windows_ad_user. No release has them yet, so CI builds Conn3x from it.
-  CONN3X_REF: d39bab3978ea3f16751d2eed79d7f15f5f34288a
+  # The first Conn3x release with windows_ad_ou, windows_ad_group and
+  # windows_ad_user.
+  CONN3X_VERSION: v0.7.3
 
 jobs:
   validate:
@@ -21,22 +21,18 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: conn3xorg/conn3x
-          ref: ${{ env.CONN3X_REF }}
-          path: conn3x
-          persist-credentials: false
-      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
-        with:
-          go-version-file: conn3x/go.mod
-          cache: false
-      - name: Build Conn3x
+      - name: Install Conn3x
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          go -C conn3x build -o "$RUNNER_TEMP/bin/conn3x" ./cmd/conn3x
+          tag="$CONN3X_VERSION"
+          file="conn3x_${tag#v}_linux_amd64.tar.gz"
+          cd "$RUNNER_TEMP"
+          curl -sSfLO "https://github.com/conn3xorg/conn3x/releases/download/$tag/$file"
+          curl -sSfLO "https://github.com/conn3xorg/conn3x/releases/download/$tag/checksums.txt"
+          grep " $file\$" checksums.txt | sha256sum -c -
+          mkdir -p bin && tar -xzf "$file" -C bin conn3x
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
-          # Its test data has HCL that's broken on purpose, and fmt below would read it.
-          rm -rf conn3x
       - run: conn3x version
       - run: conn3x fmt -check -recursive
       - name: Validate
@@ -49,6 +45,7 @@ jobs:
   # runner itself, over loopback OpenSSH, the way Conn3x's own windows-host
   # job does. A shared runner can't reboot or become a domain controller, so
   # it reads every step for real, installs AD DS, and stops before the forest.
+  # Conn3x releases have no Windows binary yet, so it's built from the same tag.
   windows:
     needs: validate
     strategy:
@@ -65,7 +62,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: conn3xorg/conn3x
-          ref: ${{ env.CONN3X_REF }}
+          ref: ${{ env.CONN3X_VERSION }}
           path: conn3x
           persist-credentials: false
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0

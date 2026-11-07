@@ -2,7 +2,7 @@
 
 A Conn3x circuit that builds an Active Directory domain from roles. One server makes a new forest, any others you list become more domain controllers, member servers join, and the directory gets the OUs, users and groups you describe. Every reboot is a step in the plan, so you see the whole build before anything changes.
 
-**Experimental.** Windows support in Conn3x is new, and the modules this circuit uses may change between releases. It needs a Conn3x build with `windows_ad_ou`, `windows_ad_group` and `windows_ad_user`: main at `d39bab3` or later, or the first release after v0.7.2.
+**Experimental.** Windows support in Conn3x is new, and the modules this circuit uses may change between releases. It needs Conn3x v0.7.3 or later.
 
 ## Usage
 
