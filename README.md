@@ -43,7 +43,7 @@ module "ad" {
 }
 ```
 
-Run `conn3x init` and `conn3x apply`. On four `Standard_B2s_v2` Azure VMs, two DCs and two members, the first apply builds the whole domain, VMs included, and a second `conn3x plan` says `No changes.` [`examples/azure-ad-lab`](https://github.com/conn3xorg/conn3x/tree/main/examples/azure-ad-lab) in the Conn3x repo builds that lab from one config.
+Run `conn3x init` and `conn3x apply`. On four `Standard_B2s_v2` Azure VMs, two DCs and two members, the first apply took 15 to 18 minutes, VMs included, and a second `conn3x plan` said `No changes.` [`examples/azure-ad-lab`](https://github.com/conn3xorg/conn3x/tree/main/examples/azure-ad-lab) in the Conn3x repo builds that lab from one config.
 
 Each host needs OpenSSH Server running and your key in `administrators_authorized_keys`, and the DCs need fixed private addresses, because the other hosts' DNS names them.
 
@@ -92,7 +92,7 @@ The forest's first admin password becomes the domain admin's. Pass it as `domain
 
 ## Tests
 
-- **On Azure:** four `Standard_B2s_v2` VMs on Windows Server 2025, built from nothing on Azure. Each time the second plan was empty, `repadmin /replsummary` showed 0 failures on both DCs, `Test-ComputerSecureChannel` was True on both members, the OUs, users, groups and computer accounts were where the inputs put them, and the passwords had 0 hits in plan and apply output, trace logs, state, and the hosts' event logs and log files.
+- **On Azure:** four `Standard_B2s_v2` VMs on Windows Server 2025, built from nothing three times in a row. Each time the second plan was empty, `repadmin /replsummary` showed 0 failures on both DCs, `Test-ComputerSecureChannel` was True on both members, the OUs, users, groups and computer accounts were where the inputs put them, `conn3x drift` caught a user taken out of a group by hand, and the passwords had 0 hits in Conn3x's plan and apply output, logs and state, and in the hosts' event logs and log files.
 - **In CI, on the windows-2022 and windows-2025 runners:** a shared runner can't reboot or become a domain controller. So CI plans the forest root against the runner itself, which runs every read for real, installs AD DS, and checks the next plan no longer has it but still has the forest. Promotion, joins and the directory steps are only tested on Azure.
 
 ## Inputs
