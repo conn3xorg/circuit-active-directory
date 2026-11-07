@@ -124,3 +124,5 @@ jobs:
           if ($plan.Contains('forest__ad_ds["runner"] will be')) { Write-Output $plan; throw 'AD DS planned again' }
           if (-not $plan.Contains('forest__forest')) { Write-Output $plan; throw 'plan has no forest' }
           Write-Output $plan
+          # plan's 2 is what this step wants; don't let it become the step's exit code.
+          exit 0
